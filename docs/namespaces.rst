@@ -1,0 +1,6 @@
+namespaces
+==========
+
+
+.. doxygennamespace:: dfuller
+    :members:
