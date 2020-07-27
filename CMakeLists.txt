@@ -27,6 +27,7 @@ target_include_directories(dfuller
     PUBLIC include
 )
 
+target_link_libraries(dfuller usb-1.0)
 
 ## UNIT TEST SUITE
 enable_testing()
