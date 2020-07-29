@@ -25,10 +25,10 @@ std::string message(const std::string &recipient)
     return recipient.empty() ? greeting : greeting + ", " + recipient;
 }
 
-Device::Device(int interface_number, int vid, int pid, unsigned int timeout)
+Device::Device(int interface_number, int vid, int pid, unsigned int communication_timeout)
 {
     interface_number     = this->interface_number;
-    timeout              = this->timeout;
+    communication_timeout = this->communication_timeout;
     libusb_device **devs = NULL;
     int claim_status     = -1;
     int alt_status       = -1;
@@ -73,17 +73,17 @@ Device::~Device()
     libusb_exit(ctx);
 }
 
-void Device::detach()
+void Device::detach(uint16_t detach_timeout)
 {
     if (device_handle == NULL) {
         return;
     }
-    uint8_t bmRequestType = LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_OUT; //! @todo Check all requestTypes
+    uint8_t bmRequestType = LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_OUT;
     uint8_t bRequest      = DFU_DETACH;
-    uint16_t wValue       = timeout;
+    uint16_t wValue       = detach_timeout;
     uint16_t wIndex       = interface_number;
     uint16_t wLength      = 0;
-    libusb_control_transfer(device_handle, bmRequestType, bRequest, wValue, wIndex, NULL, wLength, timeout);
+    libusb_control_transfer(device_handle, bmRequestType, bRequest, wValue, wIndex, NULL, wLength, communication_timeout);
 }
 
 void Device::download(uint16_t wBlockNum, unsigned char *data, uint16_t length)
@@ -96,7 +96,7 @@ void Device::download(uint16_t wBlockNum, unsigned char *data, uint16_t length)
     uint16_t wValue       = wBlockNum;
     uint16_t wIndex       = interface_number;
     uint16_t wLength      = length;
-    libusb_control_transfer(device_handle, bmRequestType, bRequest, wValue, wIndex, data, wLength, timeout);
+    libusb_control_transfer(device_handle, bmRequestType, bRequest, wValue, wIndex, data, wLength, communication_timeout);
 }
 
 void Device::get_status()
@@ -113,7 +113,7 @@ void Device::get_status()
     uint16_t wIndex       = interface_number;
     uint8_t data[6]       = { 0 };
     uint16_t wLength      = 6;
-    return_code           = libusb_control_transfer(device_handle, bmRequestType, bRequest, wValue, wIndex, data, wLength, timeout);
+    return_code           = libusb_control_transfer(device_handle, bmRequestType, bRequest, wValue, wIndex, data, wLength, communication_timeout);
 
     if (return_code == expected_return_code) {
         status             = data[0];
@@ -138,7 +138,7 @@ void Device::clear_status()
     uint16_t wValue       = 0;
     uint16_t wIndex       = interface_number;
     uint16_t wLength      = 0;
-    libusb_control_transfer(device_handle, bmRequestType, bRequest, wValue, wIndex, NULL, wLength, timeout);
+    libusb_control_transfer(device_handle, bmRequestType, bRequest, wValue, wIndex, NULL, wLength, communication_timeout);
 }
 
 void Device::abort()
@@ -151,7 +151,7 @@ void Device::abort()
     uint16_t wValue       = 0;
     uint16_t wIndex       = interface_number;
     uint16_t wLength      = 0;
-    libusb_control_transfer(device_handle, bmRequestType, bRequest, wValue, wIndex, NULL, wLength, timeout);
+    libusb_control_transfer(device_handle, bmRequestType, bRequest, wValue, wIndex, NULL, wLength, communication_timeout);
 }
 
 void Device::get_state()
@@ -165,7 +165,7 @@ void Device::get_state()
     uint16_t wValue       = 0;
     uint16_t wIndex       = interface_number;
     uint16_t wLength      = 1;
-    libusb_control_transfer(device_handle, bmRequestType, bRequest, wValue, wIndex, &state, wLength, timeout);
+    libusb_control_transfer(device_handle, bmRequestType, bRequest, wValue, wIndex, &state, wLength, communication_timeout);
 }
 
 void Device::upload(uint16_t wBlockNum, unsigned char *data, uint16_t length)
@@ -178,15 +178,15 @@ void Device::upload(uint16_t wBlockNum, unsigned char *data, uint16_t length)
     uint16_t wValue       = wBlockNum;
     uint16_t wIndex       = interface_number;
     uint16_t wLength      = length;
-    libusb_control_transfer(device_handle, bmRequestType, bRequest, wValue, wIndex, data, wLength, timeout);
+    libusb_control_transfer(device_handle, bmRequestType, bRequest, wValue, wIndex, data, wLength, communication_timeout);
 }
 
 void Device::check_if_kernel_attached()
 {
-    if (libusb_kernel_driver_active(device_handle, 0) == 1) { // is kernel driver attached?
-        cout << "Kernel Driver Active" << endl; //! @todo move to some logging function?
+    if (libusb_kernel_driver_active(device_handle, 0) == 1) {     // is kernel driver attached?
+        cout << "Kernel Driver Active" << endl;                   //! @todo move to some logging function?
         if (libusb_detach_kernel_driver(device_handle, 0) == 0) { // try to detach it
-            cout << "Kernel Driver Detached!" << endl; //! @todo move to some logging function?
+            cout << "Kernel Driver Detached!" << endl;            //! @todo move to some logging function?
         }
     }
 }
