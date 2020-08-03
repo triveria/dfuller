@@ -9,6 +9,7 @@
  * @brief Some brief description about this module.
  * @details
  * Some long description about this module.
+ * @todo  Add documentation
  *
  */
 
@@ -27,11 +28,11 @@ std::string message(const std::string &recipient)
 
 Device::Device(int interface_number, int vid, int pid, unsigned int communication_timeout)
 {
-    interface_number     = this->interface_number;
+    interface_number      = this->interface_number;
     communication_timeout = this->communication_timeout;
-    libusb_device **devs = NULL;
-    int claim_status     = -1;
-    int alt_status       = -1;
+    libusb_device **devs  = NULL;
+    int claim_status      = -1;
+    int alt_status        = -1;
 
     libusb_init(&ctx);
     libusb_get_device_list(ctx, &devs);
@@ -86,14 +87,14 @@ void Device::detach(uint16_t detach_timeout)
     libusb_control_transfer(device_handle, bmRequestType, bRequest, wValue, wIndex, NULL, wLength, communication_timeout);
 }
 
-void Device::download(uint16_t wBlockNum, unsigned char *data, uint16_t length)
+void Device::download(uint16_t block_number, unsigned char *data, uint16_t length)
 {
     if (device_handle == NULL) {
         return;
     }
     uint8_t bmRequestType = LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE | LIBUSB_ENDPOINT_OUT;
     uint8_t bRequest      = DFU_DNLOAD;
-    uint16_t wValue       = wBlockNum;
+    uint16_t wValue       = block_number;
     uint16_t wIndex       = interface_number;
     uint16_t wLength      = length;
     libusb_control_transfer(device_handle, bmRequestType, bRequest, wValue, wIndex, data, wLength, communication_timeout);
@@ -159,23 +160,22 @@ void Device::get_state()
     if (device_handle == NULL) {
         return;
     }
-    uint8_t state; // "return value" of this function
     uint8_t bmRequestType = LIBUSB_ENDPOINT_IN | LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE;
     uint8_t bRequest      = DFU_GETSTATE;
     uint16_t wValue       = 0;
     uint16_t wIndex       = interface_number;
     uint16_t wLength      = 1;
-    libusb_control_transfer(device_handle, bmRequestType, bRequest, wValue, wIndex, &state, wLength, communication_timeout);
+    state                 = libusb_control_transfer(device_handle, bmRequestType, bRequest, wValue, wIndex, NULL, wLength, communication_timeout);
 }
 
-void Device::upload(uint16_t wBlockNum, unsigned char *data, uint16_t length)
+void Device::upload(uint16_t block_number, unsigned char *data, uint16_t length)
 {
     if (device_handle == NULL) {
         return;
     }
     uint8_t bmRequestType = LIBUSB_ENDPOINT_IN | LIBUSB_REQUEST_TYPE_CLASS | LIBUSB_RECIPIENT_INTERFACE;
     uint8_t bRequest      = DFU_UPLOAD;
-    uint16_t wValue       = wBlockNum;
+    uint16_t wValue       = block_number;
     uint16_t wIndex       = interface_number;
     uint16_t wLength      = length;
     libusb_control_transfer(device_handle, bmRequestType, bRequest, wValue, wIndex, data, wLength, communication_timeout);

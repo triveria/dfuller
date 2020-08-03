@@ -13,7 +13,7 @@
 /** @mainpage DFUller
  *
  * This is a cool project that does such and such.
- * @todo
+ * @todo Add documentation
  *
  */
 
@@ -25,14 +25,14 @@
 /*! @brief Some brief bla about dfuller.
  *  @details
  *  Some long bla about dfuller.
- * @todo
+ * @todo Add documentation
  */
 namespace dfuller {
 
 /*! @brief Some brief bla about message().
  *  @details
  *  Some long bla about message().
- * @todo
+ * @todo Add documentation
  *
  *  @param recipient The thing or person that shall be greeted.
  *  @return message
@@ -73,6 +73,7 @@ std::string message(const std::string &recipient);
 #define STATUS_ERROR_STALLEDPKT   0x0F //!< Device stalled an unexpected request.
 
 /* DFU commands */
+//! @todo Disclaimer that descriptions here are taken from DFU1.1.pdf
 #define DFU_DETACH    0 //!< Request device to enter STATE_APP_DETACH state.
 #define DFU_DNLOAD    1 //!< Request device to accept a block of the new firmware from host.
 #define DFU_UPLOAD    2 //!< Request device to send a block of the current firmware to the host.
@@ -83,36 +84,36 @@ std::string message(const std::string &recipient);
 
 class Device {
 public:
-    libusb_device_handle *device_handle = NULL; //! @todo
-    libusb_context *ctx                 = NULL; //! @todo
-    int interface_number                = 0;    //! @todo
-    unsigned int communication_timeout   = -1;   //! @todo
-    uint8_t status;                             //! @todo
-    uint8_t status_description;                 //! @todo
-    uint8_t state;                              //! @todo
-    unsigned int poll_timeout;                  //! @todo
+    libusb_device_handle *device_handle = NULL; //! @todo Add documentation
+    libusb_context *ctx                 = NULL; //! @todo Add documentation
+    int interface_number                = 0;    //! @todo Add documentation
+    unsigned int communication_timeout  = -1;   //! @todo Add documentation
+    uint8_t status;                             //! @todo Add documentation
+    uint8_t status_description;                 //! @todo Add documentation
+    uint8_t state;                              //! @todo Add documentation
+    unsigned int poll_timeout;                  //! @todo Add documentation
 
     /**
      * @brief Construct a new Device object
-     * @todo
+     * @todo Add documentation
      * 
      * @param interface_number 
      * @param vid 
      * @param pid 
      * @param timeout 
      */
-    Device(int interface_number, int vid, int pid, unsigned int timeout);
+    Device(int interface_number, int vid, int pid, unsigned int communication_timeout);
 
     /**
      * @brief Destroy the Device object
-     * @todo
+     * @todo Add documentation
      * 
      */
     ~Device();
 
     /**
      * @brief
-     * @todo
+     * @todo Add documentation
      * 
      * @param detach_timeout 
      */
@@ -120,56 +121,56 @@ public:
 
     /**
      * @brief 
-     * @todo
+     * @todo Add documentation
      * 
-     * @param wBlockNum 
+     * @param block_number 
      * @param data 
      * @param length 
      */
-    void download(uint16_t wBlockNum, unsigned char *data, uint16_t length);
+    void download(uint16_t block_number, unsigned char *data, uint16_t length);
 
     /**
      * @brief Get the status object
-     * @todo
+     * @todo Add documentation
      * 
      */
     void get_status();
 
     /**
      * @brief 
-     * @todo
+     * @todo Add documentation
      * 
      */
     void clear_status();
 
     /**
      * @brief 
-     * @todo
+     * @todo Add documentation
      * 
      */
     void abort();
 
     /**
      * @brief Get the state object
-     * @todo
+     * @todo Add documentation
      * 
      */
     void get_state();
 
     /**
      * @brief 
-     * @todo
+     * @todo Add documentation
      * 
-     * @param wBlockNum 
+     * @param block_number 
      * @param data 
      * @param length 
      */
-    void upload(uint16_t wBlockNum, unsigned char *data, uint16_t length);
+    void upload(uint16_t block_number, unsigned char *data, uint16_t length);
 
 private:
     /**
      * @brief 
-     * @todo
+     * @todo Add documentation
      * 
      */
     void check_if_kernel_attached();
